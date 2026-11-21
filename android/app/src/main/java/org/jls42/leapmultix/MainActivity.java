@@ -40,6 +40,7 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         // Avant super.onCreate : le pont de Capacitor annonce ses plugins à la page en démarrant
         registerPlugin(FilesPlugin.class);
+        registerPlugin(SpeechPlugin.class);
         super.onCreate(savedInstanceState);
         if (getBridge() != null) {
             chromeClient = new FullscreenChromeClient(getBridge());

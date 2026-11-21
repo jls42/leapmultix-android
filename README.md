@@ -41,8 +41,8 @@ SANS_VOIX=1 scripts/build-aab.sh main
   une appli sans voix.
 - Le pack de voix existe toujours (il est déclaré dans le build), avec une simple note à la place
   des clips, qui pèsent 487 Mo dans l'appli complète.
-- Dans cette appli, rien n'est lu à voix haute : la page de l'appli n'a pas la synthèse vocale
-  d'un navigateur.
+- Dans cette appli, le jeu lit avec la synthèse vocale du téléphone (plugin `LeapMultixSpeech`,
+  ci-dessous) : la page de l'appli n'a pas celle d'un navigateur.
 - `scripts/build-release.sh` refuse `SANS_VOIX=1`, et vérifie dans l'AAB produit que chacune des
   trois langues a ses clips : une appli publiée embarque toujours la voix enregistrée.
 
@@ -119,6 +119,12 @@ REVISION=1 scripts/build-release.sh main # seconde publication d'un même site
   La reprise d'un fichier passe par le sélecteur de fichiers de Capacitor. Avec un site d'avant
   ce plugin, la section est cachée (même script) : le bouton n'y ferait rien. Les profils sont
   aussi gardés par la sauvegarde d'Android (`allowBackup`, dite dans la politique de l'appli).
+- **Voix du téléphone** (plugin `LeapMultixSpeech`, `SpeechPlugin.java`) : la synthèse vocale
+  d'Android, pour une appli construite sans voix enregistrée. Le site ne l'appelle que si l'appli
+  l'annonce, que la page n'a pas de synthèse vocale et qu'aucune voix enregistrée n'est
+  embarquée : dans l'appli publiée, il ne sert pas. Une phrase à la fois, chaque appel reçoit une
+  réponse (finie, coupée, ou refusée quand la langue manque au téléphone). Le manifeste déclare
+  le service vocal (`<queries>`), sans autorisation à demander.
 - **Adresse de l'appli fixée** (`server` dans `capacitor.config.json` : `https://localhost`) : les
   profils des joueurs sont rangés par adresse ; une autre adresse, et ils sembleraient perdus.
   Ne jamais la changer, y compris lors d'une migration de Capacitor.
