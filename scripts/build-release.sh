@@ -16,6 +16,11 @@ export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
 export ANDROID_HOME=$HOME/Android/Sdk
 AAB=$APP/android/app/build/outputs/bundle/release/app-release.aab
 cd "$APP"
+# Une appli publiée embarque toujours la voix enregistrée
+if [ "${SANS_VOIX:-}" = 1 ]; then
+  echo "SANS_VOIX=1 refusé : un AAB de publication embarque la voix enregistrée" >&2
+  exit 1
+fi
 echo "=== site ($BRANCH) $(date +%H:%M:%S)"
 [ "${SKIP_SITE:-}" = 1 ] || bash scripts/bundle-www.sh "$BRANCH" | tail -4
 echo "=== cap sync $(date +%H:%M:%S)"
@@ -46,6 +51,13 @@ echo "non débogable"
 # Taille de chaque module (fichiers décompressés) : base, images_pack, voix_pack
 unzip -l "$AAB" | awk 'NF == 4 && $4 ~ "/" { split($4, p, "/"); size[p[1]] += $1 }
   END { for (m in size) if (m != "META-INF" && m != "BUNDLE-METADATA") printf "%-12s %6.1f Mo\n", m, size[m] / 1048576 }' | sort
+# Voix enregistrée : des clips pour chacune des trois langues (un site ou des packs repris par
+# SKIP_SITE=1 pourraient venir d'une construction sans voix)
+for lang in fr en es; do
+  CLIPS=$(unzip -Z1 "$AAB" | grep -cE "^voix/assets/public/voice/$lang/[^/]+/[^/]+\.mp3$" || true)
+  echo "voix $lang : $CLIPS clips"
+  [ "$CLIPS" -ge 1000 ] || { echo "Voix enregistrée absente ou incomplète ($lang)" >&2; exit 1; }
+done
 # Signature : jarsigner et keytool la lisent sans mot de passe
 if "$JAVA_HOME/bin/jarsigner" -verify "$AAB" | grep -q 'jar is unsigned'; then
   echo "AAB NON SIGNÉ, pas prêt pour le Play Store : clé d'envoi absente (README, « Publier »)" >&2

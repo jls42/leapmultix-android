@@ -68,14 +68,26 @@ rm -f "$POLICY"
 if grep -qi "plausible analytics" "$WWW/assets/translations/"*.json; then echo "Plausible encore décrit dans les textes de l'appli" >&2; exit 1; fi
 
 # Voix enregistrée embarquée (sans réseau) : l'adresse des voix que deploy.sh écrit sur le site,
-# puis la voix par défaut de chaque langue, copiée depuis le dépôt privé des voix (le serveur
-# des voix n'est pas joignable depuis l'appli)
+# puis la voix par défaut de chaque langue, copiée depuis le dépôt des voix (le serveur des voix
+# n'est pas joignable depuis l'appli). Ce dépôt est privé : SANS_VOIX=1 construit l'appli sans
+# voix enregistrée (un choix dit, jamais deviné : un dépôt introuvable arrête la construction).
+VOICES=${LEAPMULTIX_VOICES:-"$REPO/../leapmultix-voices"}
+if [ "${SANS_VOIX:-}" = 1 ]; then
+  echo "SANS_VOIX=1 : aucune voix enregistrée embarquée"
+  du -sh "$WWW"
+  exit 0
+fi
+if [ ! -d "$VOICES/clips" ]; then
+  echo "Dépôt des voix introuvable : $VOICES" >&2
+  echo "Il est privé. Pour construire l'appli sans voix enregistrée : SANS_VOIX=1 (README)." >&2
+  exit 1
+fi
 VOICE_META_EMPTY='<meta name="leapmultix-voice-base" content="" />'
 VOICE_META='<meta name="leapmultix-voice-base" content="/voice/" />'
 grep -qF "$VOICE_META_EMPTY" "$WWW/index.html" || { echo "balise des voix introuvable" >&2; exit 1; }
 sed -i "s#$VOICE_META_EMPTY#$VOICE_META#" "$WWW/index.html"
 for lang in fr en es; do
-  (cd "$REPO" && npm run -s voice:publish -- local --site "$WWW" --lang "$lang" --audience all --default-on)
+  (cd "$REPO" && npm run -s voice:publish -- local --site "$WWW" --out "$VOICES" --lang "$lang" --audience all --default-on)
 done
 # Les liens deviennent des copies : l'APK ne garde pas de lien symbolique
 for link in "$WWW"/voice/*/*; do
