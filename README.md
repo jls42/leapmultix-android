@@ -27,6 +27,25 @@ DEVICE=<id> scripts/build-aab.sh   # un autre téléphone que le premier de « a
    puis leur installation par-dessus l'appli en place. **Jamais de désinstallation** : elle
    effacerait les profils des joueurs.
 
+## Construire sans la voix enregistrée
+
+Les clips de la voix enregistrée viennent d'un dépôt privé, cherché à côté de celui du jeu
+(`../leapmultix-voices`, ou `LEAPMULTIX_VOICES`). Sans lui, la construction s'arrête et le dit.
+Pour construire quand même l'appli, sans voix enregistrée :
+
+```bash
+SANS_VOIX=1 scripts/build-aab.sh main
+```
+
+- C'est un choix à dire, jamais deviné : un dépôt des voix introuvable ne produit pas en silence
+  une appli sans voix.
+- Le pack de voix existe toujours (il est déclaré dans le build), avec une simple note à la place
+  des clips, qui pèsent 487 Mo dans l'appli complète.
+- Dans cette appli, rien n'est lu à voix haute : la page de l'appli n'a pas la synthèse vocale
+  d'un navigateur.
+- `scripts/build-release.sh` refuse `SANS_VOIX=1`, et vérifie dans l'AAB produit que chacune des
+  trois langues a ses clips : une appli publiée embarque toujours la voix enregistrée.
+
 ## Publier sur le Play Store
 
 ```bash
