@@ -119,12 +119,13 @@ REVISION=1 scripts/build-release.sh main # seconde publication d'un même site
   La reprise d'un fichier passe par le sélecteur de fichiers de Capacitor. Avec un site d'avant
   ce plugin, la section est cachée (même script) : le bouton n'y ferait rien. Les profils sont
   aussi gardés par la sauvegarde d'Android (`allowBackup`, dite dans la politique de l'appli).
-- **Voix du téléphone** (plugin `LeapMultixSpeech`, `SpeechPlugin.java`) : la synthèse vocale
-  d'Android, pour une appli construite sans voix enregistrée. Le site ne l'appelle que si l'appli
-  l'annonce, que la page n'a pas de synthèse vocale et qu'aucune voix enregistrée n'est
-  embarquée : dans l'appli publiée, il ne sert pas. Une phrase à la fois, chaque appel reçoit une
-  réponse (finie, coupée, ou refusée quand la langue manque au téléphone). Le manifeste déclare
-  le service vocal (`<queries>`), sans autorisation à demander.
+- **Voix du téléphone** (plugin `LeapMultixSpeech`, `SpeechPlugin.java`) : la page de l'appli
+  n'a pas la synthèse vocale d'un navigateur, alors la « voix de l'appareil » du jeu est ici la
+  synthèse vocale d'Android. Le jeu s'en sert quand le joueur décoche « Voix enregistrée », ou
+  dans une appli construite sans elle. Une phrase à la fois, chaque appel reçoit une réponse
+  (finie, coupée, ou refusée quand la langue manque au téléphone). Le manifeste déclare le
+  service vocal (`<queries>`), sans autorisation à demander. Avec un site d'avant ce plugin,
+  les textes de l'appli ne promettent pas cette voix (`scripts/app-texts.py`).
 - **Adresse de l'appli fixée** (`server` dans `capacitor.config.json` : `https://localhost`) : les
   profils des joueurs sont rangés par adresse ; une autre adresse, et ils sembleraient perdus.
   Ne jamais la changer, y compris lors d'une migration de Capacitor.
