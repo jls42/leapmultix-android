@@ -1,0 +1,12 @@
+// Pack de ressources « voix » (Play Asset Delivery), livré avec l'installation : les clips de la
+// voix enregistrée (fr, en, es). Ses fichiers sont placés par scripts/pack-assets.sh.
+plugins {
+    id 'com.android.asset-pack'
+}
+
+assetPack {
+    packName = "voix"
+    dynamicDelivery {
+        deliveryType = "install-time"
+    }
+}

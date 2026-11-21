@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LeapMultix</string>
+    <string name="title_activity_main">LeapMultix</string>
+    <string name="package_name">org.jls42.leapmultix</string>
+    <string name="custom_url_scheme">org.jls42.leapmultix</string>
+</resources>

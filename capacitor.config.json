@@ -1,0 +1,16 @@
+{
+  "appId": "org.jls42.leapmultix",
+  "appName": "LeapMultix",
+  "webDir": "www",
+  "plugins": {
+    "SystemBars": {
+      "hidden": true,
+      "insetsHandling": "native",
+      "initialViewportFitValueHint": "cover"
+    }
+  },
+  "server": {
+    "androidScheme": "https",
+    "hostname": "localhost"
+  }
+}

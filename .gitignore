@@ -1,0 +1,25 @@
+node_modules/
+www/
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+*.apk
+*.aab
+*.keystore
+*.jks
+# Clés, certificats et fichiers d'environnement : jamais dans le dépôt
+*.pem
+*.p12
+*.key
+.env
+.env.*
+keystore.properties
+# Notes de travail gardées hors du dépôt
+/docs/
+/notes/
+# Contenu des packs de ressources : déplacé depuis www/ par scripts/pack-assets.sh
+android/images_pack/src/
+android/voix_pack/src/
+android/images_pack/build/
+android/voix_pack/build/

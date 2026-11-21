@@ -1,0 +1,44 @@
+# Mises à jour proposées en PR chaque semaine ; les correctifs de sécurité arrivent dès leur
+# publication (alertes Dependabot). La CI de chaque PR construit l'appli et passe Android Lint.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # Les paquets de Capacitor vont ensemble (même version pour core, cli et android)
+      capacitor:
+        patterns: ["@capacitor/*"]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: gradle
+    directory: /android
+    schedule:
+      interval: weekly
+    # Gradle 9 et AGP 9 attendent Capacitor 9 stable (8.6.2 aujourd'hui, 9.0.0 en candidate) :
+    # AGP 8.13, celui de Capacitor 8, ne tourne pas sous Gradle 9.6 et plus (vu le 18/11/2026)
+    ignore:
+      - dependency-name: gradle-wrapper
+        update-types: ["version-update:semver-major"]
+      - dependency-name: com.android.tools.build:gradle
+        update-types: ["version-update:semver-major"]
+    groups:
+      android:
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope

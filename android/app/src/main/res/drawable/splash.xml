@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Écran de lancement d'Android 7 à 11 : le panda de l'icône sur son bleu ciel, comme l'écran
+     du système à partir d'Android 12 (l'icône adaptative est dessinée sur 108 dp) -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/ic_launcher_background" />
+    <item
+        android:width="216dp"
+        android:height="216dp"
+        android:drawable="@mipmap/ic_launcher_foreground"
+        android:gravity="center" />
+</layer-list>

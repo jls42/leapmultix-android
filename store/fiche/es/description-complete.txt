@@ -1,0 +1,31 @@
+LeapMultix ayuda a los niños de 6 a 12 años a dominar las cuatro operaciones: multiplicación, suma, resta y división. La operación se elige en la pantalla de inicio, y cada uno aprende a su manera.
+
+SEIS MODOS DE JUEGO
+• Descubrimiento: cada tabla se muestra con puntos, saltos o conteo, con su truco.
+• Quiz: preguntas con opciones, y la explicación del cálculo después de cada respuesta.
+• Desafío: una carrera contrarreloj.
+• Aventura: diez niveles que se abren uno tras otro, a cambio de estrellas.
+• Crono: diez respuestas correctas lo más rápido posible; los cálculos fallados van a una lista de repaso.
+• Arcade: seis minijuegos.
+
+SEIS MINIJUEGOS DE ARCADE
+MultiInvaders, MultiMiam, MultiMemory, MultiSnake, MultiPop y MultiGoal. La pregunta es la misma, arriba en la pantalla; el gesto cambia en cada juego: apuntar, recorrer un laberinto, encontrar una pareja, guiar una serpiente, golpear en el lugar correcto, tirar a puerta.
+
+PARA LOS NIÑOS
+• Cinco personajes: el zorro, el panda, el unicornio, el dragón y el astronauta, algunos se desbloquean con las monedas ganadas jugando.
+• Una voz grabada acompaña el juego, en español, francés e inglés.
+• Temas de color claros y oscuros, y un aire de fiesta en Halloween, Navidad y Año Nuevo.
+• Los cálculos que cuestan vuelven más a menudo.
+
+PARA PADRES Y DOCENTES
+• Un perfil por niño en el mismo dispositivo.
+• Un panel de control: partidas jugadas, récords, tablas por repasar.
+• Tamaño del texto y alto contraste ajustables.
+• Se juega en vertical y en horizontal.
+
+SIN ANUNCIOS, SIN CUENTA, SIN CONEXIÓN
+• Sin anuncios, sin compras, sin cuenta.
+• La app no recoge ningún dato: los perfiles y las puntuaciones se quedan en el dispositivo.
+• Todo el juego está en la app: funciona sin Internet.
+
+LeapMultix es software libre (licencia AGPL-3.0). El mismo juego también se juega en un navegador: leapmultix.jls42.org

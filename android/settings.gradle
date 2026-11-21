@@ -1,0 +1,8 @@
+include ':app'
+// Packs de ressources livrés avec l'installation (scripts/pack-assets.sh)
+include ':images_pack'
+include ':voix_pack'
+include ':capacitor-cordova-android-plugins'
+project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
+
+apply from: 'capacitor.settings.gradle'

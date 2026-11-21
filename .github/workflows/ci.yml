@@ -1,0 +1,57 @@
+# Contrôle de l'appli à chaque push et chaque PR (Dependabot compris) : scripts (shellcheck),
+# dépendances npm, synchronisation Capacitor, Android Lint (toute remarque est une erreur) et
+# construction de l'AAB. Le site et la voix n'y sont pas : une page d'essai et deux packs d'un
+# fichier les remplacent, l'appli complète se construit en local (scripts/build-aab.sh).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Scripts (shellcheck)
+        run: shellcheck scripts/*.sh
+
+      - name: Node 22
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Dépendances npm
+        run: npm ci
+
+      - name: Java 21
+        uses: actions/setup-java@d1374f8ac74474200d16ef8ecee22c7ae7a51880 # v6.3.0
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+
+      - name: Site d'essai et packs
+        run: |
+          mkdir -p www
+          printf '<!doctype html><title>LeapMultix</title>\n' > www/index.html
+          npx cap sync android
+          for pack in images_pack voix_pack; do
+            mkdir -p "android/$pack/src/main/assets/public"
+            printf 'essai\n' > "android/$pack/src/main/assets/public/essai.txt"
+          done
+
+      - name: Android Lint et AAB
+        working-directory: android
+        run: ./gradlew --no-daemon lintDebug bundleDebug

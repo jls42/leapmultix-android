@@ -1,0 +1,87 @@
+apply plugin: 'com.android.application'
+
+// Numéro de version tiré du site embarqué (« const VERSION = 'v92' » de www/sw.js) : v92 donne
+// 9200, et une seconde publication du même site 9201 (-PappRevision=1), le Play Store refusant
+// un numéro déjà envoyé. Sans site (CI), 1.
+def siteVersion = {
+    def sw = rootProject.file('../www/sw.js')
+    if (!sw.exists()) return null
+    def match = sw.text =~ /const VERSION = 'v(\d+)'/
+    return match.find() ? match.group(1).toInteger() : null
+}()
+def appRevision = (project.findProperty('appRevision') ?: '0').toString().toInteger()
+if (appRevision < 0 || appRevision > 99) {
+    throw new GradleException("appRevision entre 0 et 99, pas ${appRevision}")
+}
+// Clé d'envoi du Play Store : quatre propriétés Gradle que le propriétaire pose lui-même hors du
+// dépôt (~/.gradle/gradle.properties). Sans elles, l'AAB de publication sort non signé.
+def uploadStore = project.findProperty('leapmultixUploadStoreFile')
+
+android {
+    namespace = "org.jls42.leapmultix"
+    // Images et voix dans des packs livrés avec l'installation : le module de base reste
+    // sous la limite du Play Store (500 Mo)
+    assetPacks = [":images_pack", ":voix_pack"]
+    // Android Lint : toute remarque fait échouer la construction, sauf les exceptions justifiées
+    // de app/lint.xml
+    lint {
+        lintConfig = file("lint.xml")
+        warningsAsErrors = true
+        abortOnError = true
+    }
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "org.jls42.leapmultix"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode siteVersion ? siteVersion * 100 + appRevision : 1
+        versionName siteVersion ? "v${siteVersion}" + (appRevision ? ".${appRevision}" : '') : '1.0'
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        if (uploadStore) {
+            upload {
+                storeFile = file(uploadStore)
+                storePassword = project.findProperty('leapmultixUploadStorePassword')
+                keyAlias = project.findProperty('leapmultixUploadKeyAlias')
+                keyPassword = project.findProperty('leapmultixUploadKeyPassword')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (uploadStore) {
+                signingConfig = signingConfigs.upload
+            }
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+// Pas de Google Services (notifications push) : l'appli ne contacte aucun service

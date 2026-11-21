@@ -1,0 +1,31 @@
+LeapMultix aide les enfants de 6 à 12 ans à maîtriser les quatre opérations : multiplication, addition, soustraction et division. L'opération se choisit sur l'écran d'accueil, puis chacun apprend à sa façon.
+
+SIX MODES DE JEU
+• Découverte : chaque table se montre en points, en bonds ou en comptage, avec son astuce.
+• Quiz : des questions à choix, et l'explication du calcul après chaque réponse.
+• Défi : une course contre la montre.
+• Aventure : dix niveaux à ouvrir l'un après l'autre, contre des étoiles.
+• Chrono : dix bonnes réponses le plus vite possible ; les calculs ratés vont dans une liste à revoir.
+• Arcade : six mini-jeux.
+
+SIX MINI-JEUX D'ARCADE
+MultiInvaders, MultiMiam, MultiMemory, MultiSnake, MultiPop et MultiGoal. La question est la même, affichée en haut de l'écran ; le geste change à chaque jeu : viser, parcourir un labyrinthe, retrouver une paire, guider un serpent, taper au bon endroit, tirer au but.
+
+POUR LES ENFANTS
+• Cinq personnages à incarner : le renard, le panda, la licorne, le dragon et l'astronaute, dont certains à débloquer avec les pièces gagnées en jouant.
+• Une voix enregistrée accompagne le jeu, en français, en anglais et en espagnol.
+• Des thèmes de couleur clairs et sombres, et un décor de fête à Halloween, à Noël et au Nouvel An.
+• Les calculs qui posent problème reviennent plus souvent.
+
+POUR LES PARENTS ET LES ENSEIGNANTS
+• Un profil par enfant sur le même appareil.
+• Un tableau de bord : parties jouées, records, tables à revoir.
+• Taille du texte et contraste élevé réglables.
+• Le jeu se joue en portrait comme en paysage.
+
+SANS PUBLICITÉ, SANS COMPTE, SANS CONNEXION
+• Aucune publicité, aucun achat, aucun compte.
+• L'appli ne collecte aucune donnée : les profils et les scores restent sur l'appareil.
+• Tout le jeu est dans l'appli : il fonctionne sans Internet.
+
+LeapMultix est un logiciel libre (licence AGPL-3.0). Le même jeu se joue aussi dans un navigateur : leapmultix.jls42.org

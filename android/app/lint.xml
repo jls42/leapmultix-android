@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android Lint de l'appli : toute remarque est une erreur (app/build.gradle), sauf ici,
+     chaque exception avec sa raison -->
+<lint>
+    <!-- Ressources lues par Capacitor à l'exécution (par leur nom), que l'analyse ne voit pas :
+         config.xml (couche Cordova), le thème que BridgeActivity applique au lancement, les
+         chaînes que la CLI de Capacitor écrit et relit -->
+    <issue id="UnusedResources">
+        <ignore path="src/main/res/xml/config.xml" />
+        <ignore regexp="AppTheme_NoActionBar|AppTheme.NoActionBar" />
+        <ignore regexp="package_name|custom_url_scheme" />
+    </issue>
+    <!-- Nouvelles versions de Gradle et des bibliothèques : Dependabot les propose en PR ; ici,
+         une simple information, pour que la CI ne casse pas le jour où une version paraît -->
+    <issue id="GradleDependency" severity="informational" />
+    <issue id="AndroidGradlePluginVersion" severity="informational" />
+    <issue id="NewerVersionAvailable" severity="informational" />
+</lint>

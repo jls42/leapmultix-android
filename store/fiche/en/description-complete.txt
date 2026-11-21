@@ -1,0 +1,31 @@
+LeapMultix helps children aged 6 to 12 master the four operations: multiplication, addition, subtraction and division. Pick the operation on the home screen, then learn your own way.
+
+SIX GAME MODES
+• Discovery: each table shown as dots, jumps or counting, with its trick.
+• Quiz: multiple-choice questions, with the calculation explained after each answer.
+• Challenge: a race against the clock.
+• Adventure: ten levels to open one after the other, earning stars.
+• Chrono: ten right answers as fast as you can; missed calculations go to a review list.
+• Arcade: six mini-games.
+
+SIX ARCADE MINI-GAMES
+MultiInvaders, MultiMiam, MultiMemory, MultiSnake, MultiPop and MultiGoal. The question is the same, shown at the top of the screen; the move changes with each game: aim, run through a maze, find a pair, steer a snake, tap the right spot, shoot at the goal.
+
+FOR CHILDREN
+• Five characters to play: the fox, the panda, the unicorn, the dragon and the astronaut, some of them unlocked with coins earned by playing.
+• A recorded voice goes with the game, in English, French and Spanish.
+• Light and dark colour themes, and a festive look for Halloween, Christmas and New Year.
+• Calculations that cause trouble come back more often.
+
+FOR PARENTS AND TEACHERS
+• One profile per child on the same device.
+• A dashboard: games played, records, tables to review.
+• Adjustable text size and high contrast.
+• Plays in portrait and in landscape.
+
+NO ADS, NO ACCOUNT, NO CONNECTION
+• No ads, no purchases, no account.
+• The app collects no data: profiles and scores stay on the device.
+• The whole game is in the app: it works without Internet.
+
+LeapMultix is free software (AGPL-3.0 licence). The same game also plays in a browser: leapmultix.jls42.org

@@ -1,0 +1,13 @@
+// Pack de ressources « images » (Play Asset Delivery), livré avec l'installation : les images du
+// jeu (variantes WebP et fonds). Ses fichiers sont placés par scripts/pack-assets.sh, sous
+// public/ comme le reste du site : Capacitor les lit comme les autres ressources de l'appli.
+plugins {
+    id 'com.android.asset-pack'
+}
+
+assetPack {
+    packName = "images"
+    dynamicDelivery {
+        deliveryType = "install-time"
+    }
+}
