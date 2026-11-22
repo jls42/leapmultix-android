@@ -18,6 +18,8 @@ keystore.properties
 # Notes de travail gardées hors du dépôt
 /docs/
 /notes/
+CLAUDE.local.md
+.claude/settings.local.json
 # Contenu des packs de ressources : déplacé depuis www/ par scripts/pack-assets.sh
 android/images_pack/src/
 android/voix_pack/src/
