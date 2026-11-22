@@ -2,7 +2,7 @@ LeapMultix helps children aged 6 to 12 master the four operations: multiplicatio
 
 SIX GAME MODES
 • Discovery: each table shown as dots, jumps or counting, with its trick.
-• Quiz: multiple-choice questions, with the calculation explained after each answer.
+• Quiz: multiple-choice questions, with the calculation explained after each mistake.
 • Challenge: a race against the clock.
 • Adventure: ten levels to open one after the other, earning stars.
 • Chrono: ten right answers as fast as you can; missed calculations go to a review list.
