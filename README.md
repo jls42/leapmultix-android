@@ -2,9 +2,31 @@
 
 Le jeu web [LeapMultix](https://github.com/jls42/leapmultix) emballé par Capacitor dans une
 appli Android (`org.jls42.leapmultix`). Ce dépôt se clone à côté de celui du jeu
-(`LEAPMULTIX_REPO` sinon). La publication de l'appli sur le Play Store est en préparation.
+(`LEAPMULTIX_REPO` sinon). La publication sur Google Play est en cours (test fermé) ; le lien
+de la fiche sera ajouté ici à l'ouverture au public. En attendant, le même jeu se joue dans un
+navigateur : [leapmultix.jls42.org](https://leapmultix.jls42.org).
 
 Licence : [AGPL-3.0-or-later](LICENSE), comme le jeu.
+
+## Aperçu
+
+<p align="center">
+  <img src="store/fiche/captures/fr/telephone/01-accueil.jpg" width="23%" alt="L'accueil : choix de l'opération et du mode de jeu" />
+  <img src="store/fiche/captures/fr/telephone/02-quiz-erreur.jpg" width="23%" alt="Le Quiz explique le calcul après une erreur" />
+  <img src="store/fiche/captures/fr/telephone/06-multipop.jpg" width="23%" alt="MultiPop : toucher le monstre qui porte la bonne réponse" />
+  <img src="store/fiche/captures/fr/telephone/03-aventure-menu.jpg" width="23%" alt="L'Aventure : dix niveaux à ouvrir l'un après l'autre" />
+</p>
+<p align="center">
+  <img src="store/fiche/captures/fr/telephone/04-arcade-menu.jpg" width="23%" alt="Le menu Arcade et ses six mini-jeux" />
+  <img src="store/fiche/captures/fr/telephone/07-multigoal.jpg" width="23%" alt="MultiGoal : tirer dans la cible de la bonne réponse" />
+  <img src="store/fiche/captures/fr/telephone/09-decouverte-table.jpg" width="23%" alt="La Découverte : une table et ses calculs" />
+  <img src="store/fiche/captures/fr/telephone/10-defi-question.jpg" width="23%" alt="Le Défi : une course contre la montre" />
+</p>
+
+Ce sont les captures de la fiche Google Play, prises sur le contenu de l'appli. Elles existent
+en français, en anglais et en espagnol, pour téléphone et pour tablettes de 7 et 10 pouces :
+[`store/fiche/captures/`](store/fiche/captures). Les textes de la fiche sont à côté, par
+langue : [`store/fiche/`](store/fiche).
 
 ## Refaire l'appli
 
@@ -42,7 +64,7 @@ SANS_VOIX=1 scripts/build-aab.sh main
 - C'est un choix à dire, jamais deviné : un dépôt des voix introuvable ne produit pas en silence
   une appli sans voix.
 - Le pack de voix existe toujours (il est déclaré dans le build), avec une simple note à la place
-  des clips, qui pèsent 487 Mo dans l'appli complète.
+  des clips, qui pèsent 489 Mo dans l'appli complète.
 - Dans cette appli, le jeu lit avec la synthèse vocale du téléphone (plugin `LeapMultixSpeech`,
   ci-dessous) : la page de l'appli n'a pas celle d'un navigateur.
 - `scripts/build-release.sh` refuse `SANS_VOIX=1`, et vérifie dans l'AAB produit que chacune des
