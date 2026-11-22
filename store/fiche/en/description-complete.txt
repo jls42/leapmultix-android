@@ -28,4 +28,4 @@ NO ADS, NO ACCOUNT, NO CONNECTION
 • The app collects no data: profiles and scores stay on the device.
 • The whole game is in the app: it works without Internet.
 
-LeapMultix is free software (AGPL-3.0 licence). The same game also plays in a browser: leapmultix.jls42.org
+LeapMultix is free software (AGPL-3.0 licence). Source code: github.com/jls42/leapmultix-android. The same game also plays in a browser: leapmultix.jls42.org

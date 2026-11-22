@@ -28,4 +28,4 @@ SANS PUBLICITÉ, SANS COMPTE, SANS CONNEXION
 • L'appli ne collecte aucune donnée : les profils et les scores restent sur l'appareil.
 • Tout le jeu est dans l'appli : il fonctionne sans Internet.
 
-LeapMultix est un logiciel libre (licence AGPL-3.0). Le même jeu se joue aussi dans un navigateur : leapmultix.jls42.org
+LeapMultix est un logiciel libre (licence AGPL-3.0). Code source : github.com/jls42/leapmultix-android. Le même jeu se joue aussi dans un navigateur : leapmultix.jls42.org
