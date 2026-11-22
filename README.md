@@ -17,7 +17,9 @@ DEVICE=<id> scripts/build-aab.sh   # un autre téléphone que le premier de « a
 Étapes du script :
 
 1. `scripts/bundle-www.sh <branche>` : `www/`, le site de la branche (`git archive`), sans les
-   sources PNG en haute définition, avec toutes les variantes WebP et la voix enregistrée.
+   sources PNG en haute définition, avec les variantes WebP des images de cette branche
+   (`scripts/copy-images.py` : celles d'images retirées du jeu, que le dossier de travail garde,
+   n'entrent pas dans l'appli) et la voix enregistrée.
 2. `npx cap sync android` : copie `www/` dans l'appli.
 3. `scripts/pack-assets.sh` : déplace les images et la voix dans deux packs d'éléments livrés
    à l'installation (`images_pack`, `voix_pack`, Play Asset Delivery).

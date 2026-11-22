@@ -1,7 +1,7 @@
 #!/bin/bash
 # Prépare www/ de l'appli Android d'essai : le site de la branche donnée (git archive, sans
 # toucher au dossier de travail), sans les sources PNG en haute définition ; puis, depuis le
-# dossier de travail (non versionné), toutes les variantes WebP générées et leur carte.
+# dossier de travail (non versionné), les variantes WebP des images de cette branche et leur carte.
 # Les fichiers de la liste hors ligne (sw.js) sont tous ajoutés, PNG compris.
 set -euo pipefail
 # Le dépôt du jeu, à côté de celui-ci (LEAPMULTIX_REPO pour un autre emplacement)
@@ -14,9 +14,10 @@ mkdir -p "$WWW"
 git -C "$REPO" archive "$BRANCH" index.html parents.html modes.html pwa.html offline.html sw.js \
   manifest.json favicon.ico favicon.png js css img assets \
   | tar -x -C "$WWW" --exclude='assets/voice/*' --exclude='assets/images/*' --exclude='img/*.png'
-# Images générées : toutes les variantes WebP (pas de perte de qualité) et la carte des images
-(cd "$REPO" && find assets/generated-images -type f \( -name '*.webp' -o -name 'image-map.json' \) -print0 \
-  | rsync -a --from0 --files-from=- ./ "$WWW/")
+# Images générées : toutes les variantes WebP (pas de perte de qualité) des images que la branche
+# a encore, et leur carte. Le dossier de travail garde les variantes d'images retirées du jeu.
+git -C "$REPO" ls-tree -r --name-only "$BRANCH" -- assets/images > "$LIST"
+python3 -I "$(dirname "$0")/copy-images.py" "$REPO/assets/generated-images" "$LIST" "$WWW/assets/generated-images"
 # Tout ce que la liste hors ligne nomme, PNG compris (pris dans l'arbre de la branche)
 git -C "$REPO" show "$BRANCH:sw.js" | grep -oE "^  '/[^']+'" | tr -d " '" | sed 's#^/##' > "$LIST"
 while read -r f; do
