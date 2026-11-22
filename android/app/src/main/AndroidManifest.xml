@@ -24,6 +24,11 @@
         android:appCategory="game"
         tools:targetApi="26">
 
+        <!-- L'appli ne mesure rien : la WebView n'envoie pas non plus ses statistiques d'usage -->
+        <meta-data
+            android:name="android.webkit.WebView.MetricsOptOut"
+            android:value="true" />
+
         <!-- Aucune orientation imposée : le jeu a une mise en page pour le téléphone tenu droit et
              une pour le téléphone tourné (css/landscape-phone.css du site). Une rotation ne
              recrée pas l'activité (configChanges) : la partie en cours continue. -->
