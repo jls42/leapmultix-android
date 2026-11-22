@@ -18,9 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Lit une phrase du jeu avec la synthèse vocale du téléphone. La page de l'appli n'a pas la
- * synthèse vocale d'un navigateur : dans une appli construite sans voix enregistrée, le jeu
- * confie ses phrases à ce plugin. Le site ne l'appelle pas quand une voix enregistrée est
- * embarquée.
+ * synthèse vocale d'un navigateur : la « voix de l'appareil » du jeu passe par ce plugin, quand
+ * le joueur décoche « Voix enregistrée » ou dans une appli construite sans elle.
  *
  * speak({ text, lang, rate, pitch, volume }) répond quand la phrase est finie ({ stopped: false })
  * ou coupée ({ stopped: true }), et refuse quand elle ne peut pas se dire : synthèse absente,
