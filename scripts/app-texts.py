@@ -10,8 +10,10 @@ hébergé chez AWS ; l'appli embarque tout et ne se connecte à aucun serveur. D
   voix ; voix d'« À propos » ; note de confidentialité de l'accueil) décrivent l'appli : rien
   à installer, les seules voix embarquées, la progression gardée sur l'appareil ; ceux qui
   nomment le navigateur (« Sauvegarde des joueurs », messages de place manquante) nomment
-  l'appareil, et le script échoue si un autre texte en parle encore ; aucun ne promet plus
-  la voix de l'appareil, que la page de l'appli n'a pas (même garde-fou) ;
+  l'appareil, et le script échoue si un autre texte en parle encore ; la voix de l'appareil
+  n'est promise que si le site sait la demander à l'appli (plugin LeapMultixSpeech, synthèse
+  vocale d'Android) : avec un site plus ancien, la page de l'appli n'en a pas, et aucun texte
+  ne la promet (même garde-fou) ;
 - la section « Sauvegarde des joueurs » de « Qui joue ? » reste quand le site sait confier le
   fichier à l'appli (plugin LeapMultixFiles, fenêtre « Enregistrer sous » d'Android) ; avec un
   site plus ancien elle est cachée : la WebView ne télécharge rien, le bouton ne ferait rien ;
@@ -114,8 +116,26 @@ MESSAGES = {
     },
 }
 # La page de l'appli n'a pas de synthèse vocale (speechSynthesis absent de la WebView d'Android,
-# mesuré sur téléphone) : « Voix enregistrée » décochée, rien n'est lu. La fin de chaque
-# explication de ce réglage (une par fournisseur de voix) le dit.
+# mesuré sur téléphone). Un site qui sait demander la voix du téléphone à l'appli (plugin
+# LeapMultixSpeech) garde ses textes : « Voix enregistrée » décochée, le jeu lit avec la voix de
+# l'appareil, et les deux textes de l'appli qui décrivent la voix le disent aussi.
+PHONE_VOICE = {
+    "fr": {
+        "faq_a8": " Pour la voix de l'appareil, décochez « Voix enregistrée » dans "
+        "Personnalisation.",
+        "about_features_voice": " ou voix de l'appareil",
+    },
+    "en": {
+        "faq_a8": " To use your device's voice, uncheck “Recorded voice” in Personalization.",
+        "about_features_voice": " or the device's voice",
+    },
+    "es": {
+        "faq_a8": " Para usar la voz del dispositivo, desmarca «Voz grabada» en Personalización.",
+        "about_features_voice": " o la voz del dispositivo",
+    },
+}
+# Avec un site plus ancien, rien n'est lu une fois « Voix enregistrée » décochée : la fin de
+# chaque explication de ce réglage (une par fournisseur de voix) le dit.
 VOICE_OFF = {
     "fr": ("Décochée, le jeu lit avec la voix de l'appareil.",
            "Décochée, le jeu ne lit plus à voix haute."),
@@ -211,37 +231,52 @@ def drop_search_engine_data(page):
     return page
 
 
-def translated_texts(www):
-    for lang, answers in TEXTS.items():
+def app_texts(lang, phone_voice):
+    """Textes de l'appli dans une langue ; avec la voix du téléphone, ceux de la voix la nomment."""
+    texts = dict(TEXTS[lang])
+    if phone_voice:
+        for key, more in PHONE_VOICE[lang].items():
+            texts[key] += more
+    return texts
+
+
+def voice_off_hints(texts, lang, phone_voice):
+    """Fin des explications de « Voix enregistrée » : la voix de l'appareil, si l'appli l'a."""
+    old, new = VOICE_OFF[lang]
+    hints = [key for key in texts if key.startswith("recorded_voice_hint")]
+    if not hints:
+        sys.exit(f"app-texts : aucune explication de « Voix enregistrée » dans {lang}.json")
+    for key in hints:
+        if texts[key].count(old) != 1:
+            sys.exit(f"app-texts : fin attendue introuvable dans {key} ({lang}.json)")
+        if not phone_voice:
+            texts[key] = texts[key].replace(old, new)
+
+
+def translated_texts(www, phone_voice):
+    for lang in TEXTS:
         path = www / "assets" / "translations" / f"{lang}.json"
         texts = json.loads(path.read_text(encoding="utf-8"))
-        for key, answer in {**answers, **MESSAGES[lang]}.items():
+        for key, answer in {**app_texts(lang, phone_voice), **MESSAGES[lang]}.items():
             if key not in texts:
                 sys.exit(f"app-texts : clé {key} absente de {lang}.json")
             texts[key] = answer
-        old, new = VOICE_OFF[lang]
-        hints = [key for key in texts if key.startswith("recorded_voice_hint")]
-        if not hints:
-            sys.exit(f"app-texts : aucune explication de « Voix enregistrée » dans {lang}.json")
-        for key in hints:
-            if texts[key].count(old) != 1:
-                sys.exit(f"app-texts : fin attendue introuvable dans {key} ({lang}.json)")
-            texts[key] = texts[key].replace(old, new)
+        voice_off_hints(texts, lang, phone_voice)
         left = [key for key, text in texts.items()
                 if isinstance(text, str) and BROWSER_WORD.search(text) and key not in BROWSER_ALLOWED]
         if left:
             sys.exit(f"app-texts : {lang}.json parle encore du navigateur ({', '.join(left)})")
         left = [key for key, text in texts.items()
                 if isinstance(text, str) and DEVICE_VOICE.search(text)]
-        if left:
+        if left and not phone_voice:
             sys.exit(f"app-texts : {lang}.json promet encore la voix de l'appareil "
                      f"({', '.join(left)})")
         path.write_text(json.dumps(texts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def texts_in_page(page):
+def texts_in_page(page, phone_voice):
     """Le français est aussi écrit dans la page, avant que les traductions ne se chargent."""
-    for key, text in TEXTS["fr"].items():
+    for key, text in app_texts("fr", phone_voice).items():
         # La balise fermante est celle de la balise ouvrante (« </span\n> » compris)
         pattern = rf'(<(p|li|span)\b[^>]*data-translate="{key}"[^>]*>).*?(</\2\s*>)'
         page, count = re.subn(pattern, lambda found: found.group(1) + text + found.group(3), page,
@@ -258,9 +293,15 @@ def main():
     page = index.read_text(encoding="utf-8")
     page = privacy_screen(page, policy)
     page = legal_screen(page)
-    page = texts_in_page(page)
-    page = once(r"Décochée, le jeu lit avec la voix de\s+l'appareil\.", VOICE_OFF["fr"][1], page,
-                "explication de « Voix enregistrée »")
+    # Un site qui sait demander la voix du téléphone à l'appli : ses textes sur la voix restent
+    phone_voice = "LeapMultixSpeech" in (www / "js/speech.js").read_text(encoding="utf-8")
+    page = texts_in_page(page, phone_voice)
+    voice_off = r"Décochée, le jeu lit avec la voix de\s+l'appareil\."
+    if phone_voice:
+        if len(re.findall(voice_off, page)) != 1:
+            sys.exit("app-texts : explication de « Voix enregistrée » introuvable dans la page")
+    else:
+        page = once(voice_off, VOICE_OFF["fr"][1], page, "explication de « Voix enregistrée »")
     # Un site d'avant le plugin ne sait que télécharger : son bouton ne ferait rien dans l'appli
     if "LeapMultixFiles" not in (www / "js/components/playerTools.js").read_text(encoding="utf-8"):
         page = hide_players_backup(page)
@@ -269,10 +310,10 @@ def main():
                  "Marie en français", "dans ton navigateur"):
         if word in page:
             sys.exit(f"app-texts : « {word} » encore écrit dans la page de l'appli")
-    if DEVICE_VOICE.search(page):
+    if DEVICE_VOICE.search(page) and not phone_voice:
         sys.exit("app-texts : la page de l'appli promet encore la voix de l'appareil")
     index.write_text(page, encoding="utf-8")
-    translated_texts(www)
+    translated_texts(www, phone_voice)
 
 
 if __name__ == "__main__":
