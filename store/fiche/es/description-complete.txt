@@ -2,7 +2,7 @@ LeapMultix ayuda a los niños de 6 a 12 años a dominar las cuatro operaciones: 
 
 SEIS MODOS DE JUEGO
 • Descubrimiento: cada tabla se muestra con puntos, saltos o conteo, con su truco.
-• Quiz: preguntas con opciones, y la explicación del cálculo después de cada respuesta.
+• Quiz: preguntas con opciones, y la explicación del cálculo después de cada error.
 • Desafío: una carrera contrarreloj.
 • Aventura: diez niveles que se abren uno tras otro, a cambio de estrellas.
 • Crono: diez respuestas correctas lo más rápido posible; los cálculos fallados van a una lista de repaso.
