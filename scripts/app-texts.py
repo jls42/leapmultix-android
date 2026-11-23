@@ -2,7 +2,8 @@
 """Textes du site qui seraient faux dans l'appli Android, remplacés dans www/.
 
 Le site mesure son audience (Plausible), s'installe après une première visite en ligne et est
-hébergé chez AWS ; l'appli embarque tout et ne se connecte à aucun serveur. Dans www/ :
+hébergé chez AWS ; l'appli embarque tout, et le jeu ne se connecte à aucun serveur (l'appli
+demande seulement à Google Play, au lancement, s'il existe une version plus récente). Dans www/ :
 - l'écran « Politique de confidentialité » montre la politique de l'appli, celle de la fiche
   Google Play (confidentialite-android.html du site, en français et en anglais) ;
 - l'écran « Mentions légales » dit d'abord qu'il décrit le site, pas l'appli ;
@@ -35,7 +36,9 @@ TEXTS = {
         "progression est sauvegardée sur l'appareil.",
         "faq_a6": "Oui. La progression de votre enfant reste sur votre appareil, sans compte ni "
         "adresse e-mail : l'appli ne la transmet ni à l'éditeur ni à un tiers. Elle ne mesure "
-        "aucune audience, n'affiche aucune publicité et ne se connecte à aucun serveur.",
+        "aucune audience et n'affiche aucune publicité. Le jeu ne se connecte à aucun serveur ; "
+        "l'appli demande seulement à Google Play, au lancement, s'il existe une version plus "
+        "récente.",
         "faq_a5": "Absolument ! LeapMultix est fait pour tous les écrans : téléphone et tablette. "
         "L'interface s'adapte automatiquement à la taille de l'écran.",
         "faq_a8": "Une voix de synthèse enregistrée, embarquée dans l'appli : Lucie en français "
@@ -56,7 +59,8 @@ TEXTS = {
         "is saved on the device.",
         "faq_a6": "Yes. Your child's progress stays on your device, with no account or email "
         "address: the app sends it neither to the publisher nor to any third party. It "
-        "measures no audience, shows no ads and connects to no server.",
+        "measures no audience and shows no ads. The game connects to no server; the app only "
+        "asks Google Play, at launch, whether a newer version exists.",
         "faq_a5": "Absolutely! LeapMultix is made for all screens: phone and tablet. The "
         "interface adapts automatically to the screen size.",
         "faq_a8": "A recorded synthetic voice, included in the app: Lucie in French (made with "
@@ -75,7 +79,8 @@ TEXTS = {
         "se guarda en el dispositivo.",
         "faq_a6": "Sí. Los progresos se quedan en tu dispositivo, sin cuenta ni correo "
         "electrónico: la aplicación no los envía ni al editor ni a terceros. No mide ninguna "
-        "audiencia, no muestra publicidad y no se conecta a ningún servidor.",
+        "audiencia ni muestra publicidad. El juego no se conecta a ningún servidor; la "
+        "aplicación solo pregunta a Google Play, al abrirse, si existe una versión más reciente.",
         "faq_a5": "¡Absolutamente! LeapMultix está hecho para todas las pantallas: teléfono y "
         "tableta. La interfaz se adapta automáticamente al tamaño de la pantalla.",
         "faq_a8": "Una voz sintética grabada, incluida en la aplicación: Lucie en francés "
@@ -155,10 +160,11 @@ LEGAL_NOTE = """<div class="legal-section">
                 <p>
                   Ces mentions légales sont celles du site «&nbsp;leapmultix.jls42.org&nbsp;».
                   L'appli Android LeapMultix embarque tout le jeu&nbsp;: elle ne mesure aucune
-                  audience et ne se connecte à aucun serveur. Ce qui est dit plus bas de
-                  l'hébergement et de la mesure d'audience ne concerne que le site. La politique
-                  de confidentialité de l'appli est affichée dans l'écran «&nbsp;Politique de
-                  confidentialité&nbsp;».
+                  audience et le jeu ne se connecte à aucun serveur. Au lancement, l'appli
+                  demande seulement à Google Play s'il existe une version plus récente. Ce qui
+                  est dit plus bas de l'hébergement et de la mesure d'audience ne concerne que le
+                  site. La politique de confidentialité de l'appli est affichée dans l'écran
+                  «&nbsp;Politique de confidentialité&nbsp;».
                 </p>
               </div>
               """
