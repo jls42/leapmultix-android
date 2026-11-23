@@ -41,7 +41,8 @@ DEVICE=<id> scripts/build-aab.sh   # un autre téléphone que le premier de « a
 1. `scripts/bundle-www.sh <branche>` : `www/`, le site de la branche (`git archive`), sans les
    sources PNG en haute définition, avec les variantes WebP des images de cette branche
    (`scripts/copy-images.py` : celles d'images retirées du jeu, que le dossier de travail garde,
-   n'entrent pas dans l'appli) et la voix enregistrée.
+   n'entrent pas dans l'appli), sans les images d'une fête lointaine, et avec la voix
+   enregistrée en Opus (« Une appli plus légère que le site », plus bas).
 2. `npx cap sync android` : copie `www/` dans l'appli.
 3. `scripts/pack-assets.sh` : déplace les images et la voix dans deux packs d'éléments livrés
    à l'installation (`images_pack`, `voix_pack`, Play Asset Delivery).
@@ -50,6 +51,34 @@ DEVICE=<id> scripts/build-aab.sh   # un autre téléphone que le premier de « a
    signés par la clé de débogage standard (`~/.config/.android/debug.keystore`), leur taille,
    puis leur installation par-dessus l'appli en place. **Jamais de désinstallation** : elle
    effacerait les profils des joueurs.
+
+## Une appli plus légère que le site
+
+L'appli embarque tout le jeu pour jouer sans réseau. Deux choix de `scripts/bundle-www.sh`
+l'allègent, sans rien changer au site :
+
+- **La voix enregistrée est en Opus.** Le site sert ses clips en MP3, que tous les navigateurs
+  lisent ; l'appli n'a qu'un lecteur, celui d'Android, qui lit l'Opus. Les mêmes clips,
+  convertis à 24 kb/s, pèsent près de trois fois moins. Ils se préparent une fois dans le dépôt
+  des voix, depuis le dépôt du jeu (`node scripts/voice/opus.mjs --out <dépôt des voix>`), et
+  après chaque nouvelle phrase enregistrée. La construction ne convertit rien : elle prend les
+  clips prêts, et s'arrête si l'un manque ou a changé (`scripts/check-voice-clips.py` compare
+  ensuite le site embarqué au manifeste des clips).
+- **Une fête lointaine n'est pas embarquée.** Les images de chaque fête (personnages costumés,
+  fonds, logos) pèsent une soixantaine de Mo. `scripts/drop-seasons.mjs` retire celles des
+  fêtes de la liste `FETES_ABSENTES` (« halloween » sans elle) et écrit dans `index.html`
+  quelles fêtes manquent : le jeu ne demande alors aucune de leurs images, et garde ses
+  couleurs et ses dessins ordinaires si l'appli n'a pas été mise à jour à temps.
+  - **Pour ne pas l'oublier** : une fête de la liste qui est en cours, ou qui commence dans
+    183 jours au plus, est embarquée quand même, et le journal de la construction le dit.
+    Halloween (24 octobre) manque donc à une appli construite avant le 24 avril, et revient
+    de lui-même dans toute appli construite ensuite.
+  - `FETES_ABSENTES=halloween,lunarnewyear scripts/build-aab.sh main` retire deux fêtes ;
+    `FETES_ABSENTES= scripts/build-aab.sh main` (liste vide) les embarque toutes. Les
+    identifiants sont ceux de `js/core/seasons.js` du jeu ; un identifiant inconnu arrête la
+    construction.
+  - Publier une version de l'appli dans les six mois qui précèdent une fête suffit à la
+    faire revenir chez les joueurs.
 
 ## Construire sans la voix enregistrée
 
@@ -64,11 +93,12 @@ SANS_VOIX=1 scripts/build-aab.sh main
 - C'est un choix à dire, jamais deviné : un dépôt des voix introuvable ne produit pas en silence
   une appli sans voix.
 - Le pack de voix existe toujours (il est déclaré dans le build), avec une simple note à la place
-  des clips, qui pèsent 489 Mo dans l'appli complète.
+  des clips, qui pèsent environ 190 Mo dans l'appli complète (489 Mo quand ils étaient en MP3).
 - Dans cette appli, le jeu lit avec la synthèse vocale du téléphone (plugin `LeapMultixSpeech`,
   ci-dessous) : la page de l'appli n'a pas celle d'un navigateur.
 - `scripts/build-release.sh` refuse `SANS_VOIX=1`, et vérifie dans l'AAB produit que chacune des
-  trois langues a ses clips : une appli publiée embarque toujours la voix enregistrée.
+  trois langues a tous ses clips, en Opus, sans un seul MP3 : une appli publiée embarque
+  toujours la voix enregistrée.
 
 ## Publier sur le Play Store
 
@@ -93,7 +123,8 @@ REVISION=1 scripts/build-release.sh main # seconde publication d'un même site
   construction) : le jeu et rien d'autre. Refusés : un type de fichier inattendu dans le site
   embarqué, un fichier caché ou de travail (`.env`, `.md`, scripts, tests, cartes de sources),
   un chemin du poste de construction, une clé ou un jeton, une adresse e-mail autre que celle
-  du contact, une trace du dépôt. Tout ce qui n'est ni son, ni image, ni vidéo, ni police est
+  du contact, une trace du dépôt, une image d'une fête que le site embarqué dit absente. Tout
+  ce qui n'est ni son, ni image, ni vidéo, ni police est
   lu, code compilé compris. Un build de débogage garde les chemins de ses ressources :
   `--debug` les tolère, et lui seul.
 - **Envoi** : Play Console, Test fermé, nouvelle version, l'AAB de
@@ -133,7 +164,9 @@ REVISION=1 scripts/build-release.sh main # seconde publication d'un même site
   lancement suivant, jamais pendant une partie ; refusée, la même version n'est reproposée
   qu'après trois jours. Sans Play Store (appli d'essai), rien ne s'affiche. L'invite ne se
   prouve que sur une appli installée depuis Google Play, avec une version plus récente publiée.
-- **Voix enregistrée** embarquée dans le pack voix, servie sous `/voice/` comme sur le site.
+- **Voix enregistrée** embarquée dans le pack voix, servie sous `/voice/` comme sur le site,
+  mais en Opus (fichiers `.ogg`) : l'index des voix du site embarqué annonce ce format, et le
+  jeu demande alors les clips sous ce nom.
 - **Plausible** : aucune mesure dans l'appli. `bundle-www.sh` retire d'`index.html` les blocs qui
   la lancent, puis le traceur lui-même (`js/plausible-init.js`, `js/vendor/plausible.js`) et ses
   deux lignes de la liste hors ligne ; `check-bundle.sh` refuse un build où il reviendrait.

@@ -51,13 +51,23 @@ echo "non débogable"
 # Taille de chaque module (fichiers décompressés) : base, images_pack, voix_pack
 unzip -l "$AAB" | awk 'NF == 4 && $4 ~ "/" { split($4, p, "/"); size[p[1]] += $1 }
   END { for (m in size) if (m != "META-INF" && m != "BUNDLE-METADATA") printf "%-12s %6.1f Mo\n", m, size[m] / 1048576 }' | sort
-# Voix enregistrée : des clips pour chacune des trois langues (un site ou des packs repris par
-# SKIP_SITE=1 pourraient venir d'une construction sans voix)
+# Voix enregistrée : pour chacune des trois langues, les clips en Opus du site préparé (www/),
+# tous dans l'AAB (un site ou des packs repris par SKIP_SITE=1 pourraient venir d'une
+# construction sans voix), et aucun MP3 : l'appli n'embarque que l'Opus
 for lang in fr en es; do
-  CLIPS=$(unzip -Z1 "$AAB" | grep -cE "^voix/assets/public/voice/$lang/[^/]+/[^/]+\.mp3$" || true)
-  echo "voix $lang : $CLIPS clips"
-  [ "$CLIPS" -ge 1000 ] || { echo "Voix enregistrée absente ou incomplète ($lang)" >&2; exit 1; }
+  CLIPS=$(unzip -Z1 "$AAB" | grep -cE "^voix/assets/public/voice/$lang/[^/]+/[^/]+\.ogg$" || true)
+  SITE_CLIPS=$(find "www/voice/$lang" -name '*.ogg' 2>/dev/null | wc -l)
+  echo "voix $lang : $CLIPS clips en Opus ($SITE_CLIPS dans www/)"
+  if [ "$CLIPS" -lt 1000 ] || [ "$CLIPS" != "$SITE_CLIPS" ]; then
+    echo "Voix enregistrée absente ou incomplète ($lang)" >&2
+    exit 1
+  fi
 done
+MP3=$(unzip -Z1 "$AAB" | grep -cE "^voix/assets/public/voice/.*\.mp3$" || true)
+if [ "$MP3" != 0 ]; then
+  echo "$MP3 clips de voix en MP3 dans l'AAB : l'appli n'embarque que l'Opus" >&2
+  exit 1
+fi
 # Signature : jarsigner et keytool la lisent sans mot de passe
 if "$JAVA_HOME/bin/jarsigner" -verify "$AAB" | grep -q 'jar is unsigned'; then
   echo "AAB NON SIGNÉ, pas prêt pour le Play Store : clé d'envoi absente (README, « Publier »)" >&2
