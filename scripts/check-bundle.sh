@@ -3,7 +3,7 @@
 # et rien d'autre. Refuse un fichier de travail (.env, .md, scripts, tests, cartes de sources),
 # un type de fichier inattendu dans le site embarqué, un chemin du poste de construction, une
 # clé ou un jeton, une adresse e-mail autre que celle du contact, une trace du dépôt, le traceur
-# de mesure d'audience du site.
+# de mesure d'audience du site, une image d'une fête que le site embarqué dit absente.
 #   scripts/check-bundle.sh <fichier .aab ou .apk> [--debug]
 # --debug : build de débogage, jamais envoyé au Play Store. Gradle y laisse le chemin de
 # chaque ressource (table des ressources, ~/.gradle/caches) : ces chemins sont tolérés, tout
@@ -28,7 +28,7 @@ unzip -Z1 "$BUNDLE" | grep -v '/$' > "$T/files"
 
 # 1. Le site embarqué (assets/public) : seulement les types de fichiers du jeu, et les deux
 #    licences des polices
-SITE_TYPES='mp3|webp|png|js|css|wav|mp4|webm|json|html|woff2|ico'
+SITE_TYPES='mp3|ogg|webp|png|js|css|wav|mp4|webm|json|html|woff2|ico'
 grep -E '(^|/)assets/public/' "$T/files" \
   | grep -vE "\.($SITE_TYPES)$" \
   | grep -vE '/assets/fonts/OFL-[A-Za-z0-9]+\.txt$' > "$T/types" || true
@@ -50,7 +50,7 @@ grep -E "$WORK_FILES" "$T/files" > "$T/work" || true
 
 # 3. Le contenu de tout ce qui n'est pas un son, une image, une vidéo ou une police : ni chemin
 #    du poste, ni clé, ni jeton (recherche aussi dans les fichiers binaires : code, manifestes)
-MEDIA='mp3|webp|png|wav|mp4|webm|woff2|ico'
+MEDIA='mp3|ogg|webp|png|wav|mp4|webm|woff2|ico'
 grep -vE "\.($MEDIA)$" "$T/files" > "$T/readable"
 mkdir "$T/content"
 # Les noms sont passés tels quels : aucun motif de unzip ne s'y trouve (ni *, ni ?, ni [)
@@ -84,7 +84,21 @@ if [ -n "$VCS" ] && grep -qE 'revision|http|git@' "$VCS"; then
   refuse "le build nomme le dépôt ou son commit (version-control-info)" < "$VCS"
 fi
 
+# 6. Fêtes que le site embarqué dit absentes (balise d'index.html, écrite par
+#    scripts/drop-seasons.mjs) : aucune de leurs images ne reste, le jeu ne les demanderait jamais
+INDEX=$(find "$T/content" -path '*/assets/public/index.html' -print -quit)
+ABSENT=
+if [ -n "$INDEX" ]; then
+  ABSENT=$(grep -oE '<meta name="leapmultix-seasons-absent" content="[a-z,]*"' "$INDEX" \
+    | sed -E 's/.*content="([a-z,]*)"/\1/' | tr ',' ' ' || true)
+fi
+for season in $ABSENT; do
+  grep -E "[_-]${season}[_.-][^/]*$" "$T/files" > "$T/season" || true
+  [ -s "$T/season" ] && refuse "image d'une fête que le site embarqué dit absente ($season)" < "$T/season"
+done
+
 [ "$FAILED" = 0 ] || { echo "Contenu refusé : $BUNDLE" >&2; exit 1; }
 echo "contenu contrôlé : $(wc -l < "$T/files") fichiers, $(wc -l < "$T/readable") lus, rien d'inattendu"
+echo "fêtes absentes : ${ABSENT:-aucune}"
 awk -F. '{ print $NF }' "$T/files" | grep -E "^($SITE_TYPES)$" | sort | uniq -c | sort -rn \
   | awk '{ printf "%s %s  ", $1, $2 } END { print "" }'

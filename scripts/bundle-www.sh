@@ -3,6 +3,8 @@
 # toucher au dossier de travail), sans les sources PNG en haute définition ; puis, depuis le
 # dossier de travail (non versionné), les variantes WebP des images de cette branche et leur carte.
 # Les fichiers de la liste hors ligne (sw.js) sont tous ajoutés, PNG compris.
+# Deux allègements propres à l'appli : les images d'une fête lointaine ne sont pas embarquées
+# (scripts/drop-seasons.mjs, FETES_ABSENTES), et la voix enregistrée est en Opus, pas en MP3.
 set -euo pipefail
 # Le dépôt du jeu, à côté de celui-ci (LEAPMULTIX_REPO pour un autre emplacement)
 REPO=${LEAPMULTIX_REPO:-$(cd "$(dirname "$0")/../../leapmultix" && pwd)}
@@ -68,6 +70,12 @@ python3 -I "$(dirname "$0")/app-texts.py" "$WWW" "$POLICY"
 rm -f "$POLICY"
 if grep -qi "plausible analytics" "$WWW/assets/translations/"*.json; then echo "Plausible encore décrit dans les textes de l'appli" >&2; exit 1; fi
 
+# Fêtes lointaines : leurs images ne sont pas embarquées (une soixantaine de Mo chacune). La
+# liste vient de FETES_ABSENTES (« halloween » sans elle ; vide : tout embarquer) ; une fête en
+# cours ou qui commence dans 183 jours au plus est embarquée quand même. Le script écrit dans
+# index.html quelles fêtes manquent, pour que le jeu ne demande aucune de leurs images.
+node "$(dirname "$0")/drop-seasons.mjs" "$WWW"
+
 # Voix enregistrée embarquée (sans réseau) : l'adresse des voix que deploy.sh écrit sur le site,
 # puis la voix par défaut de chaque langue, copiée depuis le dépôt des voix (le serveur des voix
 # n'est pas joignable depuis l'appli). Ce dépôt est privé : SANS_VOIX=1 construit l'appli sans
@@ -90,9 +98,21 @@ sed -i "s#$VOICE_META_EMPTY#$VOICE_META#" "$WWW/index.html"
 for lang in fr en es; do
   (cd "$REPO" && npm run -s voice:publish -- local --site "$WWW" --out "$VOICES" --lang "$lang" --audience all --default-on)
 done
+# Dans l'appli, la voix est en Opus, bien plus léger que le MP3 du site : les clips déjà
+# convertis du dépôt des voix (dossier opus/) prennent la place des MP3, et l'index l'annonce.
+# --check : rien n'est encodé ici ; un clip absent ou changé arrête la construction (les
+# convertir d'abord : node scripts/voice/opus.mjs --out <dépôt des voix>, dans le dépôt du jeu).
+(cd "$REPO" && node scripts/voice/opus.mjs --out "$VOICES" --check --site "$WWW")
 # Les liens deviennent des copies : l'APK ne garde pas de lien symbolique
 for link in "$WWW"/voice/*/*; do
   [ -L "$link" ] || continue
   src=$(readlink -f "$link"); rm "$link"; cp -r "$src" "$link"
 done
+# Contrôle : plus aucun MP3, et pour chaque langue exactement les clips du manifeste Opus de la
+# version que l'index annonce
+if find "$WWW/voice" -name '*.mp3' | grep -q .; then
+  echo "MP3 encore embarqué dans les voix" >&2
+  exit 1
+fi
+python3 -I "$(dirname "$0")/check-voice-clips.py" "$WWW/voice" "$VOICES/opus"
 du -sh "$WWW/voice" "$WWW"
