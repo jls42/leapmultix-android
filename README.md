@@ -126,6 +126,13 @@ REVISION=1 scripts/build-release.sh main # seconde publication d'un même site
 - **Portrait et paysage** : aucune orientation imposée (`AndroidManifest.xml`) ; le site a une
   mise en page pour le téléphone tourné, et une rotation ne recharge pas la partie
   (`configChanges`). L'appli reste déclarée « jeu ».
+- **Invite de mise à jour** (`UpdatePrompt`) : au lancement, une fois le jeu affiché, l'appli
+  demande au Play Store du téléphone si une version plus récente existe (bibliothèque de Google
+  Play `app-update`, mise à jour souple). Google Play affiche alors sa propre fenêtre, dans la
+  langue du téléphone ; acceptée, la mise à jour se télécharge pendant le jeu et s'installe au
+  lancement suivant, jamais pendant une partie ; refusée, la même version n'est reproposée
+  qu'après trois jours. Sans Play Store (appli d'essai), rien ne s'affiche. L'invite ne se
+  prouve que sur une appli installée depuis Google Play, avec une version plus récente publiée.
 - **Voix enregistrée** embarquée dans le pack voix, servie sous `/voice/` comme sur le site.
 - **Plausible** : aucune mesure dans l'appli. `bundle-www.sh` retire d'`index.html` les blocs qui
   la lancent, puis le traceur lui-même (`js/plausible-init.js`, `js/vendor/plausible.js`) et ses
