@@ -23,6 +23,9 @@ import com.getcapacitor.WebViewListener;
  * le transmet à l'appli (onShowCustomView). Le client de Capacitor le refusait aussitôt ;
  * celui-ci pose la vue plein écran par-dessus tout, la retire à la sortie, et le bouton retour
  * quitte d'abord le plein écran.
+ *
+ * Mise à jour : une fois l'image de bienvenue partie, Google Play propose la version plus récente
+ * s'il y en a une (UpdatePrompt).
  */
 public class MainActivity extends BridgeActivity {
 
@@ -35,6 +38,7 @@ public class MainActivity extends BridgeActivity {
     private ImageView welcome;
     private long shownAt;
     private FullscreenChromeClient chromeClient;
+    private UpdatePrompt updatePrompt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +46,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(FilesPlugin.class);
         registerPlugin(SpeechPlugin.class);
         super.onCreate(savedInstanceState);
+        updatePrompt = new UpdatePrompt(this);
         if (getBridge() != null) {
             chromeClient = new FullscreenChromeClient(getBridge());
             getBridge().getWebView().setWebChromeClient(chromeClient);
@@ -149,6 +154,8 @@ public class MainActivity extends BridgeActivity {
                         if (parent != null) parent.removeView(image);
                         image.setImageDrawable(null);
                         image.setVisibility(View.GONE);
+                        // Le jeu est à l'écran : l'invite de mise à jour ne couvre plus un chargement
+                        updatePrompt.checkAtLaunch();
                     }),
             wait
         );

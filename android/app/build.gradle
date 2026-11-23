@@ -76,6 +76,9 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
+    // Invite de mise à jour au lancement (UpdatePrompt) : la bibliothèque de Google Play qui
+    // demande au Play Store du téléphone si une version plus récente existe
+    implementation "com.google.android.play:app-update:$playAppUpdateVersion"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
@@ -84,4 +87,5 @@ dependencies {
 
 apply from: 'capacitor.build.gradle'
 
-// Pas de Google Services (notifications push) : l'appli ne contacte aucun service
+// Pas de Google Services (notifications push, mesure) : l'appli ne contacte aucun serveur
+// elle-même. Seule la mise à jour passe par le Play Store du téléphone (UpdatePrompt).
