@@ -55,3 +55,50 @@ jobs:
       - name: Android Lint et AAB
         working-directory: android
         run: ./gradlew --no-daemon lintDebug bundleDebug
+
+  # Notifications Telegram, comme pour le site du jeu : après chaque push sur main, un message
+  # dit si les contrôles sont passés, avec le titre du commit ; un échec donne le lien du run.
+  # Un run rouge ne se voit pas depuis un téléphone : cette alerte en est le témoin. Job à
+  # part, lancé quoi qu'il arrive (always()), sans aucun droit sur le dépôt. Une pull request
+  # n'envoie rien (et n'a pas accès aux secrets). Secrets du dépôt : TELEGRAM_BOT_TOKEN et
+  # TELEGRAM_CHAT_ID ; sans eux, le job le dit par un avertissement et n'échoue pas.
+  notifications:
+    name: Notifications
+    runs-on: ubuntu-24.04
+    needs: [android]
+    if: always() && github.event_name == 'push' && github.ref == 'refs/heads/main'
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      # Le titre du commit passe par env (jamais interpolé dans le shell). La réponse de l'API
+      # est vérifiée : un refus de Telegram fait échouer l'étape au lieu de prétendre avoir
+      # prévenu.
+      - name: Message Telegram
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RESULTAT: ${{ needs.android.result }}
+          TITRE: ${{ github.event.head_commit.message }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$BOT_TOKEN" ] || [ -z "$CHAT_ID" ]; then
+            echo "::warning::Secrets TELEGRAM_BOT_TOKEN ou TELEGRAM_CHAT_ID absents : aucune notification envoyée"
+            exit 0
+          fi
+          TITRE=$(printf '%s' "$TITRE" | head -n 1)
+          if [ "$RESULTAT" = success ]; then
+            TXT="✅ Appli Android LeapMultix : main à jour, contrôles verts — $TITRE"
+          else
+            TXT="⛔ Appli Android LeapMultix : les contrôles de main ont échoué ($RESULTAT) — $TITRE. Détail : $RUN_URL"
+          fi
+          REP=$(curl -sS --max-time 25 --retry 3 --retry-delay 5 \
+            "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${CHAT_ID}" \
+            -d "disable_web_page_preview=true" \
+            --data-urlencode "text=${TXT}")
+          if printf '%s' "$REP" | grep -q '"ok":true'; then
+            echo "notification envoyée"
+          else
+            echo "::error::Telegram a refusé la notification : $REP"
+            exit 1
+          fi
