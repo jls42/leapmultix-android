@@ -154,6 +154,10 @@ REVISION=1 scripts/build-release.sh main # seconde publication d'un même site
 - **Plein écran des jeux d'Arcade** : le client de Capacitor refusait la demande de la page (API
   Fullscreen) ; celui de `MainActivity` pose la vue plein écran par-dessus tout, et le bouton
   retour en sort d'abord.
+- **Bouton retour** : hors plein écran, `MainActivity` demande au jeu de revenir à l'écran
+  précédent (événement `backbutton` envoyé à la page, que le jeu annule quand il a reculé :
+  `js/back-navigation.js`). Sur le premier écran, pendant l'image de bienvenue ou sans réponse
+  du jeu en une seconde, l'appli se ferme comme avant : le bouton ne reste jamais sans effet.
 - **Portrait et paysage** : aucune orientation imposée (`AndroidManifest.xml`) ; le site a une
   mise en page pour le téléphone tourné, et une rotation ne recharge pas la partie
   (`configChanges`). L'appli reste déclarée « jeu ».

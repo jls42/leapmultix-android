@@ -24,6 +24,11 @@ import com.getcapacitor.WebViewListener;
  * celui-ci pose la vue plein écran par-dessus tout, la retire à la sortie, et le bouton retour
  * quitte d'abord le plein écran.
  *
+ * Bouton retour : hors plein écran, l'appli demande au jeu de revenir à l'écran précédent
+ * (événement « backbutton » envoyé à la page, que le jeu annule quand il a reculé). Sur le
+ * premier écran, pendant l'image de bienvenue ou sans réponse du jeu, l'appli se ferme comme
+ * avant.
+ *
  * Mise à jour : une fois l'image de bienvenue partie, Google Play propose la version plus récente
  * s'il y en a une (UpdatePrompt).
  */
@@ -32,6 +37,11 @@ public class MainActivity extends BridgeActivity {
     private static final long MIN_MS = 1200;
     private static final long MAX_MS = 6000;
     private static final long FADE_MS = 350;
+    // Le jeu répond en quelques millisecondes ; passé ce délai (page bloquée), l'appli se ferme
+    private static final long BACK_ANSWER_MS = 1000;
+    // Vrai quand le jeu a reculé d'un écran : il a annulé l'événement
+    private static final String BACK_SCRIPT =
+        "!document.dispatchEvent(new Event('backbutton',{cancelable:true}))";
     // Bleu nuit des bords de l'image : sur un écran plus allongé qu'elle, les bandes s'y fondent
     private static final int SPACE_COLOR = Color.rgb(0x00, 0x06, 0x1a);
 
@@ -57,10 +67,9 @@ public class MainActivity extends BridgeActivity {
                         @Override
                         public void handleOnBackPressed() {
                             if (chromeClient.exitFullscreen()) return;
-                            // Hors plein écran : le comportement habituel du bouton retour
-                            setEnabled(false);
-                            getOnBackPressedDispatcher().onBackPressed();
-                            setEnabled(true);
+                            // Le jeu n'est pas encore à l'écran : rien où revenir
+                            if (welcome != null) leaveApp(this);
+                            else askGameToGoBack(this);
                         }
                     }
                 );
@@ -69,6 +78,42 @@ public class MainActivity extends BridgeActivity {
         if (savedInstanceState == null && getBridge() != null) {
             showWelcome();
         }
+    }
+
+    /** Le comportement habituel du bouton retour : l'appli se ferme */
+    private void leaveApp(OnBackPressedCallback callback) {
+        callback.setEnabled(false);
+        getOnBackPressedDispatcher().onBackPressed();
+        callback.setEnabled(true);
+    }
+
+    /**
+     * Demande au jeu de revenir à l'écran précédent. Il répond « true » quand il a reculé ;
+     * toute autre réponse, ou pas de réponse à temps, ferme l'appli : le bouton retour ne
+     * reste jamais sans effet.
+     */
+    private void askGameToGoBack(OnBackPressedCallback callback) {
+        final WebView webView = getBridge().getWebView();
+        final boolean[] settled = { false };
+        final Runnable leave = () -> {
+            if (settled[0]) return;
+            settled[0] = true;
+            leaveApp(callback);
+        };
+        webView.postDelayed(leave, BACK_ANSWER_MS);
+        getBridge()
+            .eval(
+                BACK_SCRIPT,
+                answer -> {
+                    if (settled[0]) return;
+                    if (!"true".equals(answer)) {
+                        leave.run();
+                        return;
+                    }
+                    settled[0] = true;
+                    webView.removeCallbacks(leave);
+                }
+            );
     }
 
     private void showWelcome() {
